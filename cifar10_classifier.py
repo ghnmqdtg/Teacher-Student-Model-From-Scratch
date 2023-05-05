@@ -1,12 +1,14 @@
 import wandb
 import datetime
 import numpy as np
+import pandas as pd
+import seaborn as sns
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix, classification_report
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
@@ -169,6 +171,8 @@ def eval(model):
         None
     """
     print(f'\nStarting evaluation using {device}')
+    y_true = []
+    y_pred = []
     # Prepare to count predictions for each class
     correct_predictions_by_class = {classname: 0 for classname in classes}
     total_predictions_by_class = {classname: 0 for classname in classes}
@@ -181,6 +185,8 @@ def eval(model):
             labels = labels.to(device)
             outputs = model(images)
             _, predictions = torch.max(outputs, 1)
+            y_true += labels.tolist()
+            y_pred += predictions.tolist()
             # Collect the correct predictions for each class
             for label, prediction in zip(labels, predictions):
                 if label == prediction:
@@ -192,6 +198,43 @@ def eval(model):
         accuracy = 100 * float(correct_count) / \
             total_predictions_by_class[classname]
         print(f'Accuracy for class: {classname:5s} is {accuracy:.1f} %')
+
+    # Print overall accuracy
+    overall_accuracy = 100 * \
+        sum(correct_predictions_by_class.values()) / \
+        sum(total_predictions_by_class.values())
+    print(f'\nOverall accuracy: {overall_accuracy:.1f} %\n')
+
+    # Compute confusion matrix
+    cm = confusion_matrix(y_true, y_pred)
+    # Plot confusion matrix as heatmap
+    sns.heatmap(cm, annot=True, cmap='Blues', fmt='d',
+                xticklabels=classes, yticklabels=classes)
+    plt.savefig('./imgs/confusion_matrix.png')
+    print(f'Confusion matrix saved to ./imgs/confusion_matrix.png')
+
+    # Compute precision, recall, and F1 score
+    report = classification_report(
+        y_true, y_pred, target_names=classes, output_dict=True)
+
+    # Extract precision, recall, and F1 scores from classification report
+    precision = [report[label]['precision'] for label in classes]
+    recall = [report[label]['recall'] for label in classes]
+    f1_score = [report[label]['f1-score'] for label in classes]
+
+    # Create a dataframe to store the scores
+    df_scores = pd.DataFrame(
+        {'Precision': precision, 'Recall': recall, 'F1-score': f1_score}, index=classes)
+
+    # Plot the scores using bar charts
+    sns.set_style('whitegrid')
+    ax = df_scores.plot(kind='bar', figsize=(8, 6))
+    ax.set_title('Classification Report')
+    ax.set_xlabel('Classes')
+    ax.set_ylabel('Score')
+    plt.xticks(rotation=45, ha='right')
+    plt.savefig('./imgs/classification_report.png')
+    print(f'Classification report saved to ./imgs/classification_report.png')
 
 
 if __name__ == '__main__':
