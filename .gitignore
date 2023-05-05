@@ -160,6 +160,8 @@ cython_debug/
 #.idea/
 
 # Custom
-data
-wandb
+*.pt, *.pth
+data/
+imgs/
+wandb/
 test.py

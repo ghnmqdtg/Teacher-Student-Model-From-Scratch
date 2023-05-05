@@ -1,3 +1,5 @@
+import wandb
+import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -86,6 +88,7 @@ def train(model_path, train_loader, test_loader):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
+    wandb.watch(model, criterion, log="all")
     num_epochs = 5
     for epoch in range(num_epochs):
         running_loss = 0.0
@@ -104,8 +107,14 @@ def train(model_path, train_loader, test_loader):
 
             # Print statistics
             running_loss += loss.item()
-        epoch_loss = running_loss / len(train_loader.dataset)
-        print(f'epoch: {epoch + 1}/{num_epochs}, loss: {epoch_loss:.3f}')
+
+            # print every 2000 mini-batches
+            if i % 2000 == 1999:
+                print('[%d, %5d] loss: %.3f' %
+                      (epoch + 1, i + 1, running_loss / 2000))
+                wandb.log({'epoch': epoch+1, 'loss': running_loss/2000})
+                running_loss = 0.0
+
         running_loss = 0.0
 
     torch.save(model.state_dict(), model_path)
@@ -163,6 +172,11 @@ def eval(model):
 
 
 if __name__ == '__main__':
+    # Start a new run
+    wandb.init(project='CIFAR_Net',
+               entity='ghnmqdtg',
+               name=f'CIFAR-Net-{datetime.datetime.now().strftime("%Y%m%d-%H%M%S")}')
+
     batch_size = 4
     model_path = './cifar_net.pt'
 
