@@ -90,93 +90,111 @@ CIFAR10 dataset is used in this project. The dataset is automatically downloaded
 ## Results
 - Comparison of accuracy between teacher and student model
 
-  <table width="50%" align="center" border="1" style="text-align:center">
-    <caption><b>Accuracy for both teacher and student model</b></caption>
-    <tr>
-      <th style="text-align:center;">Class</th>
-      <th style="text-align:center;">Teacher</th>
-      <th style="text-align:center;">Student</th>
-    </tr>
-    <tr>
-      <td>plane</td>
-      <td>96.8 %</td>
-      <td>68.2 %</td>
-    </tr>
-    <tr>
-      <td>car</td>
-      <td>97.1 %</td>
-      <td>84.2 %</td>
-    </tr>
-    <tr>
-      <td>bird</td>
-      <td>96.4 %</td>
-      <td>49.8 %</td>
-    </tr>
-    <tr>
-      <td>cat</td>
-      <td>92.0 %</td>
-      <td>45.5 %</td>
-    </tr>
-    <tr>
-      <td>deer</td>
-      <td>95.3 %</td>
-      <td>63.4 %</td>
-    </tr>
-    <tr>
-      <td>dog</td>
-      <td>92.3 %</td>
-      <td>49.2 %</td>
-    </tr>
-    <tr>
-      <td>frog</td>
-      <td>98.1 %</td>
-      <td>86.0 %</td>
-    </tr>
-    <tr>
-      <td>horse</td>
-      <td>97.8 %</td>
-      <td>75.1 %</td>
-    </tr>
-    <tr>
-      <td>ship</td>
-      <td>98.3 %</td>
-      <td>77.2 %</td>
-    </tr>
-    <tr>
-      <td>truck</td>
-      <td>97.2 %</td>
-      <td>78.2 %</td>
-    </tr>
-    <tr>
-      <td>Overall</td>
-      <td>96.1 %</td>
-      <td>67.7 %</td>
-    </tr>
-  </table>
+<table width="50%" align="center" border="1" style="text-align:center">
+  <caption><b>Accuracy for both teacher and student model</b></caption>
+  <tr>
+    <th style="text-align:center;">Class</th>
+    <th style="text-align:center;">Teacher</th>
+    <th style="text-align:center;">Student</th>
+    <th style="text-align:center;">Basic CNN</th>
+  </tr>
+  <tr>
+    <td>plane</td>
+    <td>96.8 %</td>
+    <td>68.2 %</td>
+    <td>78.1 %</td>
+  </tr>
+  <tr>
+    <td>car</td>
+    <td>97.1 %</td>
+    <td>84.2 %</td>
+    <td>75.9 %</td>
+  </tr>
+  <tr>
+    <td>bird</td>
+    <td>96.4 %</td>
+    <td>49.8 %</td>
+    <td>52.2 %</td>
+  </tr>
+  <tr>
+    <td>cat</td>
+    <td>92.0 %</td>
+    <td>45.5 %</td>
+    <td>42.6 %</td>
+  </tr>
+  <tr>
+    <td>deer</td>
+    <td>95.3 %</td>
+    <td>63.4 %</td>
+    <td>58.9 %</td>
+  </tr>
+  <tr>
+    <td>dog</td>
+    <td>92.3 %</td>
+    <td>49.2 %</td>
+    <td>65.4 %</td>
+  </tr>
+  <tr>
+    <td>frog</td>
+    <td>98.1 %</td>
+    <td>86.0 %</td>
+    <td>80.9 %</td>
+  </tr>
+  <tr>
+    <td>horse</td>
+    <td>97.8 %</td>
+    <td>75.1 %</td>
+    <td>67.7 %</td>
+  </tr>
+  <tr>
+    <td>ship</td>
+    <td>98.3 %</td>
+    <td>77.2 %</td>
+    <td>77.1 %</td>
+  </tr>
+  <tr>
+    <td>truck</td>
+    <td>97.2 %</td>
+    <td>78.2 %</td>
+    <td>75.9 %</td>
+  </tr>
+  <tr>
+    <td>Overall</td>
+    <td>96.1 %</td>
+    <td>67.7 %</td>
+    <td>67.5 %</td>
+  </tr>
+</table>
+
 
 - Comparison of statistics between teacher and student model
+
   <table align="center" width="100%" border="0">
     <tr>
         <td colspan="2" style="text-align:center; font-size:14px;"><b>Confusion Matrix<b></td>
     </tr>
     <tr>
-        <td width="50%" style="text-align:center;font-size:14px;"><b>Teacher<b></td>
-        <td width="50%" style="text-align:center;font-size:14px;"><b>Student<b></td>
+        <td width="33%" style="text-align:center;font-size:14px;"><b>Teacher<b></td>
+        <td width="33%" style="text-align:center;font-size:14px;"><b>Student<b></td>
+        <td width="33%" style="text-align:center;font-size:14px;"><b>Basic CNN<b></td>
     </tr>
     <tr>
         <td><img src="imgs/custom_resnet50/confusion_matrix.png"></img></td>
         <td><img src="imgs/student/confusion_matrix.png"></img></td>
+        <td><img src="imgs/basic_cnn/confusion_matrix.png"></img></td>
     </tr>
     <tr>
         <td colspan="2" style="text-align:center; font-size:14px;"><b>Classification Report<b></td>
     </tr>
     <tr>
-        <td width="50%" style="text-align:center;font-size:14px;"><b>Teacher<b></td>
-        <td width="50%" style="text-align:center;font-size:14px;"><b>Student<b></td>
+        <td width="33%" style="text-align:center;font-size:14px;"><b>Teacher<b></td>
+        <td width="33%" style="text-align:center;font-size:14px;"><b>Student<b></td>
+        <td width="33%" style="text-align:center;font-size:14px;"><b>Basic CNN<b></td>
     </tr>
     <tr>
         <td><img src="imgs/custom_resnet50/classification_report.png"></img></td>
         <td><img src="imgs/student/classification_report.png"></img></td>
+        <td><img src="imgs/basic_cnn/classification_report.png"></img></td>
     </tr>
   </table>
 

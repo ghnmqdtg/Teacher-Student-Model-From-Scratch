@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 import torchvision
 
-from custom_resnet50 import CustomResNet50
+from custom_resnet50 import CustomResNet50, BasicCNN
 from teacher_student_model import Teacher, Student
 
 
@@ -109,6 +109,13 @@ if __name__ == '__main__':
     custom_resnet50 = custom_resnet50.to(device)
     custom_resnet50.load_state_dict(torch.load(config.CIFAR10_RESNET50_PATH), strict=False)
     eval(custom_resnet50, 'custom_resnet50')
+
+    # Evaluate the basic_cnn
+    print('\n===== Evaluating the basic_cnn =====')
+    basic_cnn = BasicCNN()
+    basic_cnn = basic_cnn.to(device)
+    basic_cnn.load_state_dict(torch.load(config.BASIC_CNN_PATH))
+    eval(basic_cnn, 'basic_cnn')
 
     # TODO: Check why the result is not good, it's basically the same as custom_resnet50
     # Evaluate the teacher model
