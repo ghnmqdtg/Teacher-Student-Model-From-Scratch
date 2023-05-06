@@ -162,7 +162,8 @@ cython_debug/
 # Custom
 *.pt
 *.pth
+*.out
 data/
-imgs/
 wandb/
 test.py
+slurm_train.sh

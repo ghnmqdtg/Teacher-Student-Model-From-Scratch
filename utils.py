@@ -1,6 +1,20 @@
+import os
+import config
 import torch
 import torchvision
 import torchvision.transforms as transforms
+
+def create_folder(path):
+    """
+    Create a folder if it does not exist
+
+    Input:
+        path: path to the folder
+    Output:
+        None
+    """
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 
 def prepare_dataset(batch_size):
@@ -22,14 +36,14 @@ def prepare_dataset(batch_size):
     ])
 
     train_set = torchvision.datasets.CIFAR10(
-        root='./data',
+        root=config.CIFAR10_DATA_PATH,
         train=True,
         download=True,
         transform=transform
     )
 
     test_set = torchvision.datasets.CIFAR10(
-        root='./data',
+        root=config.CIFAR10_DATA_PATH,
         train=False,
         download=True,
         transform=transform

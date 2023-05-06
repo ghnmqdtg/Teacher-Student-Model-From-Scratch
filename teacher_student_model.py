@@ -1,12 +1,8 @@
-import utils
 import wandb
+import utils
+import config
 import datetime
-import numpy as np
-import pandas as pd
-import seaborn as sns
 from tqdm import tqdm
-import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix, classification_report
 
 import torch
 import torch.nn as nn
@@ -24,7 +20,6 @@ class Teacher(nn.Module):
             weights='ResNet50_Weights.DEFAULT')
         # Modify the last layer to fit CIFAR10 dataset, since it was trained on ImageNet (1000 classes)
         self.model.fc = nn.Linear(self.model.fc.in_features, 10)
-        self.model = self.model.to(device)
         if pretrained_weight:
             print(f'Load pre-trained weights from {pretrained_weight}')
             self.model.load_state_dict(torch.load(pretrained_weight), strict=False)
@@ -120,13 +115,13 @@ def train_teacher(teacher_model, train_loader, test_loader, optimizer, criterion
         criterion: the loss function
     """
     # Start a new run
-    wandb.init(project='CIFAR_Net',
+    wandb.init(project='Teacher-Student-Model',
                entity='ghnmqdtg',
                name=f'teacher-{datetime.datetime.now().strftime("%Y%m%d-%H%M%S")}')
     # Load the datasets into dataloaders
     dataloaders = {'train': train_loader, 'val': test_loader}
     # Print the model architecture
-    print(f'Teacher model architecture:\n{teacher_model}')
+    print(f'\nTeacher model architecture:\n{teacher_model}')
     # Compute the total number of trainable parameters in the model
     num_params = sum(p.numel()
                      for p in teacher_model.parameters() if p.requires_grad)
@@ -181,8 +176,7 @@ def train_teacher(teacher_model, train_loader, test_loader, optimizer, criterion
                     {'epoch': epoch+1, 'loss': epoch_loss, 'accuracy': epoch_acc})
 
     # Save model weights
-    # TODO: Use a config file to the path to the model weights
-    save_path = './checkpoints/teacher_model.pt'
+    save_path = config.TEACTHER_PATH
     torch.save(teacher_model.state_dict(), save_path)
     print(f'Finished Training, model saved to {save_path}')
 
@@ -201,13 +195,13 @@ def train_student(student_model, teacher_model, train_loader, test_loader, optim
         criterion: the loss function
     """
     # Start a new run
-    wandb.init(project='CIFAR_Net',
+    wandb.init(project='Teacher-Student-Model',
                entity='ghnmqdtg',
                name=f'student-{datetime.datetime.now().strftime("%Y%m%d-%H%M%S")}')
     # Load the datasets into dataloaders
     dataloaders = {'train': train_loader, 'val': test_loader}
-    # Print the student architecture
-    print(f'Student model architecture:\n{student_model}\n')
+    # Print the model architecture
+    print(f'\nStudent model architecture:\n{student_model}\n')
     # Compute the number of trainable parameters in the student model
     num_params = sum(p.numel()
                      for p in student_model.parameters() if p.requires_grad)
@@ -260,14 +254,13 @@ def train_student(student_model, teacher_model, train_loader, test_loader, optim
             if phase == 'train':
                 # Comput epoch loss and accuracy
                 epoch_loss = running_loss / len(dataloaders[phase].dataset)
-                epoch_acc = 100 * running_corrects.double() / \
+                epoch_acc = running_corrects.double() / \
                     len(dataloaders[phase].dataset)
                 wandb.log(
                     {'epoch': epoch+1, 'loss': epoch_loss, 'accuracy': epoch_acc})
 
     # Save model weights
-    # TODO: Use a config file to the path to the model weights
-    save_path = './checkpoints/student_model.pt'
+    save_path = config.STUDENT_PATH
     torch.save(student_model.state_dict(), save_path)
     print(f'Finished Training, model saved to {save_path}')
 
@@ -278,16 +271,19 @@ if __name__ == '__main__':
     print(f'===== Device: {device} =====')
     # CIFAR10 dataset has 50000 training images and 10000 test images
     # Set batch_size to 100, so we have 500 batches for training and 100 batches for testing
-    batch_size = 100
-    pretrained_weight = './checkpoints/teacher_model.pt'
+    batch_size = config.BATCH_SIZE
+    pretrained_weight = config.TEACTHER_PATH
     # pretrained_weight = None
+    
+    # Create folders to save model weights
+    utils.create_folder(config.CHECKPOINTS_PATH)
+
     # Prepare dataset
     train_loader, test_loader, classes = utils.prepare_dataset(
         batch_size=batch_size)
     # If pretrained_weight is None, train the teacher model
     if pretrained_weight is None:
-        # TODO: Call training function from `cifar10_classifier.py``
-        teacher = Teacher(pretrained_weight=None)
+        teacher = Teacher(pretrained_weight=None).to(device)
         teacher_optimizer = optim.SGD(
             teacher.parameters(), lr=0.001, momentum=0.9)
         teacher_criterion = nn.CrossEntropyLoss()
