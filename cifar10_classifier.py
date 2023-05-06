@@ -130,7 +130,7 @@ def train(model_path, train_loader, test_loader):
             pbar.set_description(
                 f'Epoch {epoch+1}/{num_epochs}, loss={running_loss/(i+1):.4f}')
 
-            # print every 100 mini-batches
+            # Save to wandb every 100 mini-batches
             if i % 100 == 99:
                 wandb.log({'epoch': epoch+1, 'loss': running_loss/100})
                 running_loss = 0.0
@@ -150,8 +150,8 @@ def train(model_path, train_loader, test_loader):
                 total += labels.size(0)
                 correct += (predictions == labels).sum().item()
 
-        accuracy = 100 * correct / total
-        print(f'Accuracy of the network on the test images: {accuracy:.2f} %')
+        accuracy = correct / total
+        print(f'Accuracy of the network on the test images: {100 * accuracy:.2f} %')
         wandb.log({'epoch': epoch+1, 'accuracy': accuracy})
 
     # Save model weights
@@ -246,7 +246,7 @@ if __name__ == '__main__':
     # CIFAR10 dataset has 50000 training images and 10000 test images
     # Set batch_size to 100, so we have 500 batches for training and 100 batches for testing
     batch_size = 100
-    model_path = './cifar10_ResNet50.pt'
+    model_path = './checkpoints/cifar10_ResNet50.pt'
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f'device: {device}')
