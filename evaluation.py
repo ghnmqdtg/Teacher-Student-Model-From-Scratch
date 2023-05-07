@@ -117,12 +117,11 @@ if __name__ == '__main__':
     custom_resnet18.load_state_dict(torch.load(config.CIFAR10_RESNET18_PATH), strict=False)
     eval(custom_resnet18, 'custom_resnet18')
 
-    # TODO: Check why the result is not good here, its structure is basically the same as custom_resnet50
-    # TODO: It should be able to achieve 96% accuracy
     # Evaluate the teacher model
     print('\n===== Evaluating the teacher model =====')
-    teacher = Teacher(pretrained_weight=None)
+    teacher = Teacher()
     teacher = teacher.to(device)
+    teacher.load_state_dict(torch.load(config.TEACHER_PATH))
     eval(teacher, 'teacher')
 
     # Evaluate the student model

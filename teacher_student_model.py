@@ -13,16 +13,13 @@ import torchvision
 
 # Define the teacher model based on pretrained ResNet50
 class Teacher(nn.Module):
-    def __init__(self, pretrained_weight=None):
+    def __init__(self):
         super(Teacher, self).__init__()
         # Load pre-trained ResNet50 model
         self.model = torchvision.models.resnet50(
             weights='ResNet50_Weights.DEFAULT')
         # Modify the last layer to fit CIFAR10 dataset, since it was trained on ImageNet (1000 classes)
         self.model.fc = nn.Linear(self.model.fc.in_features, 10)
-        if pretrained_weight:
-            print(f'Load pre-trained weights from {pretrained_weight}')
-            self.model.load_state_dict(torch.load(pretrained_weight), strict=False)
 
     def forward(self, x):
         return self.model(x)
@@ -253,7 +250,7 @@ if __name__ == '__main__':
     # CIFAR10 dataset has 50000 training images and 10000 test images
     # Set batch_size to 100, so we have 500 batches for training and 100 batches for testing
     batch_size = config.BATCH_SIZE
-    pretrained_weight = config.TEACTHER_PATH
+    pretrained_weight = config.TEACHER_PATH
     # pretrained_weight = None
     
     # Create folders to save model weights
@@ -262,16 +259,17 @@ if __name__ == '__main__':
     # Prepare dataset
     train_loader, test_loader, classes = utils.prepare_dataset(
         batch_size=batch_size)
+
     # If pretrained_weight is None, train the teacher model
+    teacher = Teacher().to(device)
     if pretrained_weight is None:
-        teacher = Teacher(pretrained_weight=None).to(device)
         teacher_optimizer = optim.SGD(
             teacher.parameters(), lr=config.LEARNING_RATE, momentum=config.MOMENTUM)
         teacher_criterion = nn.CrossEntropyLoss()
         train_teacher(teacher_model=teacher, train_loader=train_loader, test_loader=test_loader,
                       optimizer=teacher_optimizer, criterion=teacher_criterion)
     else:
-        teacher = Teacher(pretrained_weight=pretrained_weight).to(device)
+        teacher.load_state_dict(torch.load(pretrained_weight))
 
     teacher.eval()
     # Train the student model
