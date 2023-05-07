@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, classification_report
 
 import torch
-import torch.nn as nn
-import torchvision
 
 from custom_resnet50 import CustomResNet50, CustomResNet18
 from teacher_student_model import Teacher, Student

@@ -10,6 +10,33 @@ The teacher-student model is trained with knowledge distillation. The loss funct
 - Torchvision 0.14.1
 - CUDA 11.7
 
+## How to run it?
+
+1. Clone this repository
+
+    ```
+    $ git clone https://github.com/ghnmqdtg/teacher-student-model-from-scratch
+    ```
+
+2. Install the required packages
+
+    ```
+    $ pip install -r requirements.txt
+    ```
+
+3. Train the teacher-student model
+
+    ```
+    $ python teacher_student_model.py.py
+    ```
+
+4. Evaluate the teacher-student model
+
+    ```
+    $ python evaluate.py
+    ```
+
+
 ## Organization
 
 ```
@@ -40,9 +67,9 @@ CIFAR10 dataset is used in this project. The dataset is automatically downloaded
 <table align="center" style="text-align:center">
   <tr>
     <th style="text-align:center;"><b></b></th>
-    <th style="text-align:center;"><b>Teacher (ResNet50)</b></th>
-    <th style="text-align:center;"><b>Student (ResNet18 without KD)</b></th>
-    <th style="text-align:center;"><b>Student (ResNet18 with KD)</b></th>
+    <th style="text-align:center;"><b>Teacher<br>(ResNet50)</b></th>
+    <th style="text-align:center;"><b>Student<br>(ResNet18 without KD)</b></th>
+    <th style="text-align:center;"><b>Student<br>(ResNet18 with KD)</b></th>
   </tr>
   <tr>
     <th>Batch Size</th>
@@ -58,7 +85,7 @@ CIFAR10 dataset is used in this project. The dataset is automatically downloaded
   </tr>
   <tr>
     <th>Optimizer</th>
-    <td colspan="3">SGD with learning rate 0.001, momentum 0.9</td>
+    <td colspan="3">SGD with learning rate 0.001 and momentum 0.9</td>
   </tr>
   <tr>
     <th>Loss Function</th>
@@ -68,32 +95,6 @@ CIFAR10 dataset is used in this project. The dataset is automatically downloaded
   </tr>
 </table>
 
-## How to run it?
-
-1. Clone this repository
-
-    ```
-    $ git clone https://github.com/ghnmqdtg/teacher-student-model-from-scratch
-    ```
-
-2. Install the required packages
-
-    ```
-    $ pip install -r requirements.txt
-    ```
-
-3. Train the teacher-student model
-
-    ```
-    $ python teacher_student_model.py.py
-    ```
-
-4. Evaluate the teacher-student model
-
-    ```
-    $ python evaluate.py
-    ```
-
 ## Results
 - Comparison of accuracy between teacher, student and student without knowledge distillation.
 
@@ -101,75 +102,75 @@ CIFAR10 dataset is used in this project. The dataset is automatically downloaded
     <caption><b>Accuracy for both teacher and student model</b></caption>
     <tr>
       <th style="text-align:center;">Class</th>
-      <th style="text-align:center;">Teacher (ResNet50)</th>
-      <th style="text-align:center;">Student (ResNet18 with KD)</th>
-      <th style="text-align:center;">Student (ResNet18 without KD)</th>
+      <th style="text-align:center;">Teacher<br>(ResNet50)</th>
+      <th style="text-align:center;">Student<br>(ResNet18 with KD)</th>
+      <th style="text-align:center;">Student<br>(ResNet18 without KD)</th>
     </tr>
     <tr>
-      <td>plane</td>
+      <td>Plane</td>
       <td>96.1 %</td>
       <td>95.6 %</td>
       <td>95.7 %</td>
     </tr>
     <tr>
-      <td>car</td>
+      <td>Car</td>
       <td>97.0 %</td>
       <td>97.7 %</td>
       <td>96.6 %</td>
     </tr>
     <tr>
-      <td>bird</td>
+      <td>Bird</td>
       <td>95.4 %</td>
       <td>93.2 %</td>
       <td>93.2 %</td>
     </tr>
     <tr>
-      <td>cat</td>
+      <td>Cat</td>
       <td>91.2 %</td>
       <td>87.7 %</td>
       <td>86.8 %</td>
     </tr>
     <tr>
-      <td>deer</td>
+      <td>Deer</td>
       <td>95.5 %</td>
       <td>94.0 %</td>
       <td>93.6 %</td>
     </tr>
     <tr>
-      <td>dog</td>
+      <td>Dog</td>
       <td>91.9 %</td>
       <td>89.9 %</td>
       <td>92.1 %</td>
     </tr>
     <tr>
-      <td>frog</td>
+      <td>Frog</td>
       <td>97.6 %</td>
       <td>96.7 %</td>
       <td>96.6 %</td>
     </tr>
     <tr>
-      <td>horse</td>
+      <td>Horse</td>
       <td>95.5 %</td>
       <td>95.4 %</td>
       <td>95.6 %</td>
     </tr>
     <tr>
-      <td>ship</td>
+      <td>Ship</td>
       <td>97.4 %</td>
       <td>96.0 %</td>
       <td>95.1 %</td>
     </tr>
     <tr>
-      <td>truck</td>
+      <td>Truck</td>
       <td>96.2 %</td>
       <td>95.8 %</td>
       <td>95.3 %</td>
     </tr>
     <tr>
-      <td>Overall</td>
-      <td>95.4 %</td>
-      <td>94.2 %</td>
-      <td>94.1 %</td>
+      <td><b>Overall<b></td>
+      <td><b>95.4 %<b></td>
+      <td><b>94.2 %<b></td>
+      <td><b>94.1 %<b></td>
     </tr>
   </table>
 
@@ -178,7 +179,7 @@ CIFAR10 dataset is used in this project. The dataset is automatically downloaded
 
   <table align="center" width="100%" border="0">
     <tr>
-        <td colspan="2" style="text-align:center; font-size:14px;"><b>Confusion Matrix<b></td>
+        <td colspan="3" style="text-align:center; font-size:14px;"><b>Confusion Matrix<b></td>
     </tr>
     <tr>
         <td width="33%" style="text-align:center;font-size:14px;"><b>Teacher (ResNet50)<b></td>
@@ -191,7 +192,7 @@ CIFAR10 dataset is used in this project. The dataset is automatically downloaded
         <td><img src="imgs/custom_resnet18/confusion_matrix.png"></img></td>
     </tr>
     <tr>
-        <td colspan="2" style="text-align:center; font-size:14px;"><b>Classification Report<b></td>
+        <td colspan="3" style="text-align:center; font-size:14px;"><b>Classification Report<b></td>
     </tr>
     <tr>
         <td width="33%" style="text-align:center;font-size:14px;"><b>Teacher (ResNet50)<b></td>

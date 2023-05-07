@@ -1,0 +1,12 @@
+autopep8==2.0.2
+matplotlib==3.7.1
+numpy==1.22.4
+pandas==2.0.1
+tqdm==4.65.0
+wandb==0.15.2
+seaborn==0.12.2
+scikit-learn==1.2.2
+torch==1.13.1+cu117
+torchaudio==0.13.1+cu117
+torchmetrics==0.11.4
+torchvision==0.14.1+cu117
