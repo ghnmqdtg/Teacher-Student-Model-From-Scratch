@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 import torchvision
 
-from custom_resnet50 import CustomResNet50, BasicCNN
+from custom_resnet50 import CustomResNet50, CustomResNet18
 from teacher_student_model import Teacher, Student
 
 
@@ -110,12 +110,12 @@ if __name__ == '__main__':
     custom_resnet50.load_state_dict(torch.load(config.CIFAR10_RESNET50_PATH), strict=False)
     eval(custom_resnet50, 'custom_resnet50')
 
-    # Evaluate the basic_cnn
-    print('\n===== Evaluating the basic_cnn =====')
-    basic_cnn = BasicCNN()
-    basic_cnn = basic_cnn.to(device)
-    basic_cnn.load_state_dict(torch.load(config.BASIC_CNN_PATH))
-    eval(basic_cnn, 'basic_cnn')
+    # Evaluate the custom_resnet18
+    print('\n===== Evaluating the custom_resnet18 =====')
+    custom_resnet18 = CustomResNet18()
+    custom_resnet18 = custom_resnet18.to(device)
+    custom_resnet18.load_state_dict(torch.load(config.CIFAR10_RESNET18_PATH), strict=False)
+    eval(custom_resnet18, 'custom_resnet18')
 
     # TODO: Check why the result is not good here, its structure is basically the same as custom_resnet50
     # TODO: It should be able to achieve 96% accuracy

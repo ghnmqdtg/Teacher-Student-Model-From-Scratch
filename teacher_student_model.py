@@ -28,59 +28,18 @@ class Teacher(nn.Module):
         return self.model(x)
 
 
-# Define the student model based on basic CNN
+# Define the student model based on pretrained ResNet18
 class Student(nn.Module):
     def __init__(self):
-        super().__init__()
-        # Input shape (3, 224, 224), output shape (64, 112, 112)
-        self.layer1 = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=3, padding=1),
-            # The num_features of BatchNorm2d should be the same as the num_channels of Conv2d
-            nn.BatchNorm2d(64),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2)
-        )
-        # Input shape (64, 112, 112), output shape (64, 56, 56)
-        self.layer2 = nn.Sequential(
-            nn.Conv2d(64, 64, kernel_size=3, padding=1),
-            nn.BatchNorm2d(64),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2)
-        )
-        # Input shape (64, 56, 56), output shape (64, 28, 28)
-        self.layer3 = nn.Sequential(
-            nn.Conv2d(64, 64, kernel_size=3, padding=1),
-            nn.BatchNorm2d(64),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2)
-        )
-        # Input shape (64, 28, 28), output shape (24, 14, 14)
-        self.layer4 = nn.Sequential(
-            nn.Conv2d(64, 24, kernel_size=3, padding=1),
-            nn.BatchNorm2d(24),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2)
-        )
-        # Input shape (24, 14, 14), output shape (12, 7, 7)
-        self.layer5 = nn.Sequential(
-            nn.Conv2d(24, 12, kernel_size=3, padding=1),
-            nn.BatchNorm2d(12),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2)
-        )
-        # Input shape (12, 7, 7), output shape (10)
-        self.fc = nn.Linear(12 * 7 * 7, 10)
+        super(Student, self).__init__()
+        # Load pre-trained ResNet18 model
+        self.model = torchvision.models.resnet18(
+            weights='ResNet18_Weights.DEFAULT')
+        # Modify the last layer to fit CIFAR10 dataset, since it was trained on ImageNet (1000 classes)
+        self.model.fc = nn.Linear(self.model.fc.in_features, 10)
 
     def forward(self, x):
-        x = self.layer1(x)
-        x = self.layer2(x)
-        x = self.layer3(x)
-        x = self.layer4(x)
-        x = self.layer5(x)
-        # Flatten all dimensions except batch
-        x = torch.flatten(x, 1)
-        x = self.fc(x)
-        return x
+        return self.model(x)
 
 
 # Define the loss function for knowledge distillation
@@ -184,7 +143,7 @@ def train_teacher(teacher_model, train_loader, test_loader, optimizer, criterion
                     {'epoch': epoch+1, 'loss': epoch_loss, 'accuracy': epoch_acc})
 
     # Save model weights
-    save_path = config.TEACTHER_PATH
+    save_path = config.TEACHER_PATH
     torch.save(teacher_model.state_dict(), save_path)
     # Finish the run
     wandb.finish()
@@ -271,7 +230,7 @@ def train_student(student_model, teacher_model, train_loader, test_loader, optim
                 pbar.set_description(
                     f'Epoch {epoch+1}/{num_epochs} | {phase} | Loss: {running_loss/(i+1):.4f} | Acc: {running_corrects.double()/(i+1):.4f}')
 
-            if phase == 'train':
+            if phase == 'test':
                 # Comput epoch loss and accuracy
                 epoch_loss = running_loss / len(dataloaders[phase].dataset)
                 epoch_acc = running_corrects.double() / \
