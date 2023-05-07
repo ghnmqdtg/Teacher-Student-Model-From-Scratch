@@ -90,14 +90,14 @@ class DistillationLoss:
         # Input of nn.KLDivLoss() should be a distribution in the log space
         # REF: https://pytorch.org/docs/stable/generated/torch.nn.KLDivLoss.html
         self.distillation_loss = nn.KLDivLoss(reduction='batchmean')
-        self.temperature = 1
-        self.alpha = 0.5
+        self.temperature = config.TEMPERATURE
+        self.alpha = config.ALPHA
 
     def __call__(self, student_logits, labels, teacher_logits):
-        student_loss = (1 - self.alpha) * \
+        student_loss = self.alpha * \
             self.student_loss(student_logits, labels)
         # nn.LogSoftmax() is used to convert logits to log-probabilities
-        distillation_loss = self.alpha * self.distillation_loss(F.log_softmax(student_logits / self.temperature, dim=1),
+        distillation_loss = (1 - self.alpha) * self.distillation_loss(F.log_softmax(student_logits / self.temperature, dim=1),
                                                                 F.softmax(teacher_logits / self.temperature, dim=1))
         return student_loss + distillation_loss
 
@@ -114,9 +114,17 @@ def train_teacher(teacher_model, train_loader, test_loader, optimizer, criterion
         optimizer: the optimizer
         criterion: the loss function
     """
+    # Define a config dictionary object
+    wandb_config = {
+        "num_epochs": config.NUM_EPOCHS_TEACHER,
+        "batch_size": config.BATCH_SIZE,
+        "learning_rate": config.LEARNING_RATE,
+        "momentum": config.MOMENTUM,
+    }
     # Start a new run
     wandb.init(project='Teacher-Student-Model',
                entity='ghnmqdtg',
+               config=wandb_config,
                name=f'teacher-{datetime.datetime.now().strftime("%Y%m%d-%H%M%S")}')
     # Load the datasets into dataloaders
     dataloaders = {'train': train_loader, 'val': test_loader}
@@ -131,7 +139,7 @@ def train_teacher(teacher_model, train_loader, test_loader, optimizer, criterion
     # Watch model in wandb
     wandb.watch(teacher_model, criterion, log="all")
     # Set number of epochs
-    num_epochs = 5
+    num_epochs = config.NUM_EPOCHS_TEACHER
     for epoch in range(num_epochs):
         for phase in ['train', 'val']:
             if phase == 'train':
@@ -178,6 +186,8 @@ def train_teacher(teacher_model, train_loader, test_loader, optimizer, criterion
     # Save model weights
     save_path = config.TEACTHER_PATH
     torch.save(teacher_model.state_dict(), save_path)
+    # Finish the run
+    wandb.finish()
     print(f'Finished Training, model saved to {save_path}')
 
 
@@ -194,9 +204,19 @@ def train_student(student_model, teacher_model, train_loader, test_loader, optim
         optimizer: the optimizer
         criterion: the loss function
     """
+    # Define a config dictionary object
+    wandb_config = {
+        "num_epochs": config.NUM_EPOCHS_STUDENT,
+        "batch_size": config.BATCH_SIZE,
+        "learning_rate": config.LEARNING_RATE,
+        "momentum": config.MOMENTUM,
+        "temperature": config.TEMPERATURE,
+        "alpha": config.ALPHA,
+    }
     # Start a new run
     wandb.init(project='Teacher-Student-Model',
                entity='ghnmqdtg',
+                config=wandb_config,
                name=f'student-{datetime.datetime.now().strftime("%Y%m%d-%H%M%S")}')
     # Load the datasets into dataloaders
     dataloaders = {'train': train_loader, 'val': test_loader}
@@ -211,7 +231,7 @@ def train_student(student_model, teacher_model, train_loader, test_loader, optim
     # Watch model in wandb
     wandb.watch(student_model, criterion, log="all")
     # Set number of epochs
-    num_epochs = 10
+    num_epochs = config.NUM_EPOCHS_STUDENT
     for epoch in range(num_epochs):
         for phase in ['train', 'val']:
             if phase == 'train':
@@ -262,6 +282,8 @@ def train_student(student_model, teacher_model, train_loader, test_loader, optim
     # Save model weights
     save_path = config.STUDENT_PATH
     torch.save(student_model.state_dict(), save_path)
+    # Finish the run
+    wandb.finish()
     print(f'Finished Training, model saved to {save_path}')
 
 
@@ -285,16 +307,17 @@ if __name__ == '__main__':
     if pretrained_weight is None:
         teacher = Teacher(pretrained_weight=None).to(device)
         teacher_optimizer = optim.SGD(
-            teacher.parameters(), lr=0.001, momentum=0.9)
+            teacher.parameters(), lr=config.LEARNING_RATE, momentum=config.MOMENTUM)
         teacher_criterion = nn.CrossEntropyLoss()
         train_teacher(teacher_model=teacher, train_loader=train_loader, test_loader=test_loader,
                       optimizer=teacher_optimizer, criterion=teacher_criterion)
     else:
         teacher = Teacher(pretrained_weight=pretrained_weight).to(device)
 
+    teacher.eval()
     # Train the student model
     student = Student().to(device)
-    student_optimizer = optim.SGD(student.parameters(), lr=0.001, momentum=0.9)
+    student_optimizer = optim.SGD(student.parameters(), lr=config.LEARNING_RATE, momentum=config.MOMENTUM)
     student_criterion = DistillationLoss()
     train_student(student_model=student, teacher_model=teacher, train_loader=train_loader, test_loader=test_loader,
                   optimizer=student_optimizer, criterion=student_criterion)

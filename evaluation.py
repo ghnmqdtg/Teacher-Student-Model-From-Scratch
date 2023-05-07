@@ -117,7 +117,8 @@ if __name__ == '__main__':
     basic_cnn.load_state_dict(torch.load(config.BASIC_CNN_PATH))
     eval(basic_cnn, 'basic_cnn')
 
-    # TODO: Check why the result is not good, it's basically the same as custom_resnet50
+    # TODO: Check why the result is not good here, its structure is basically the same as custom_resnet50
+    # TODO: It should be able to achieve 96% accuracy
     # Evaluate the teacher model
     print('\n===== Evaluating the teacher model =====')
     teacher = Teacher(pretrained_weight=None)
